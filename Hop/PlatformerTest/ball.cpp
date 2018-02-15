@@ -44,7 +44,7 @@ void Ball::update()
 	Platform *close = getClosestPlatform();
 
 	// temp auto control
-	this->x -= (this->x - close->x) * 0.12f;
+	//this->x -= (this->x - close->x) * 0.12f;
 
 	const float accelSpeed = 0.6f;
 
@@ -77,6 +77,12 @@ void Ball::update()
 	// apply velocity
 	this->x += this->xvel;
 
+	// limit x pos
+	if (this->x < 5.0f)
+		this->x = 5.0f;
+	if (this->x > SCREEN_WIDTH - 4.0f)
+		this->x = SCREEN_WIDTH - 4.0f;
+
 	// grab the distance as a percentage of the spawn distance
 	double waveDif = (close->z - this->distBetweenBounce) / PLATFORM_SPAWN_DIST;
 	// use sin to make a smooth wave up and then down between each platform
@@ -89,6 +95,7 @@ void Ball::update()
 		float difx = fabs(this->x - close->x);
 		if (difx > 20.0f * close->size)
 		{
+			// it missed! game over
 			this->dead = true;
 			globalGame->endGame();
 			return;
