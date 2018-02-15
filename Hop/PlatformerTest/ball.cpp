@@ -1,5 +1,7 @@
 #include <cmath>
+#include <Windows.h>
 #include "ball.h"
+#include "game.h"
 #include "platform.h"
 #include "util.h"
 
@@ -7,8 +9,10 @@
 Ball::Ball(std::vector<Platform*>* pforms) : platforms(pforms)
 {
 	this->x = 32.f;
-	this->y = 18.f;
+	this->y = 20.f;
 	this->drawY = y;
+	this->xvel = 0.0f;
+	this->dead = false;
 
 	// make shape (omg I can't draw a circle)
 	// (it looks better when it's running trust me)
@@ -23,22 +27,79 @@ Ball::Ball(std::vector<Platform*>* pforms) : platforms(pforms)
 
 void Ball::update()
 {
+	// decrease the animation timer if needed so it will stop eventually
 	if (this->bounceAnimTime > 0)
 		this->bounceAnimTime--;
 
+	// fall off screen if dead
+	if (this->dead)
+	{
+		if (this->drawY < 70)
+			this->drawY += 0.5f;
+		return;
+	}
+
 	// how high the ball will be at the height of its bounce
-	const double bounceHeight = 13.1;
+	const double bounceHeight = 12.1;
 	Platform *close = getClosestPlatform();
 
-	this->x -= (this->x - close->x) * 0.09f;
+	// temp auto control
+	this->x -= (this->x - close->x) * 0.12f;
 
-	double waveDif = (close->z - this->distBetweenBounce + 0.01f) / PLATFORM_SPAWN_DIST;
+	const float accelSpeed = 0.6f;
+
+	// get x modifier - the direction we want to move
+	int mx = 0;
+	if (IsKeyDown(VK_LEFT))
+		mx -= 1;
+	if (IsKeyDown(VK_RIGHT))
+		mx += 1;
+
+	// apply acceleration
+	if (mx == 0)
+	{
+		// slow down
+		if (fabs(this->xvel) > 0.2f)
+			this->xvel *= 0.8;
+		else if (fabs(this->xvel) > 0.0f)
+			this->xvel = 0.0f;
+	}
+	else
+	{
+		this->xvel += mx * accelSpeed;
+	}
+
+	// limit velocity
+	const float maxVel = 2.0f;
+	if (fabs(this->xvel) > maxVel)
+		this->xvel = maxVel * (this->xvel < 0 ? -1 : 1);
+
+	// apply velocity
+	this->x += this->xvel;
+
+	// grab the distance as a percentage of the spawn distance
+	double waveDif = (close->z - this->distBetweenBounce) / PLATFORM_SPAWN_DIST;
+	// use sin to make a smooth wave up and then down between each platform
 	this->drawY = y - abs(sin(waveDif * 3.14159f) * bounceHeight);
 
+	// try to bounce!
 	if (close->z <= PLATFORM_BALL_INTERCEPT)
 	{
+		// check if the ball hit the platform
+		float difx = fabs(this->x - close->x);
+		if (difx > 20.0f * close->size)
+		{
+			this->dead = true;
+			globalGame->gameOver();
+			return;
+		}
+
+		// start the bounce animation
 		this->bounceAnimTime = MAX_BOUNCE_TIME;
+		// flag this platform to say that we've bounced on it
 		close->bounced = true;
+
+		globalGame->points++;
 
 		// keep track of how far the next platform is so we can jump smoothly between them
 		this->distBetweenBounce = getClosestPlatform()->z;
@@ -63,6 +124,8 @@ void Ball::draw()
 		yofs--;
 		if (ypos < 0)
 			continue;
+		if (ypos >= SCREEN_HEIGHT)
+			continue;
 		SetConsoleCursorPos((int)this->x - 5, ypos);
 		printf(this->shape[i]);
 	}
@@ -82,8 +145,4 @@ Platform *Ball::getClosestPlatform()
 			closest = p;
 	}
 	return closest;
-}
-
-void Ball::tryBounce()
-{
 }

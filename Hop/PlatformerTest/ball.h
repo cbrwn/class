@@ -14,6 +14,9 @@ class Ball
 private:
 	int bounceAnimTime;
 
+	bool dead;
+
+	float xvel;
 	float drawY;
 	float distBetweenBounce;
 	const char *shape[BALL_ART_SIZE];
@@ -21,7 +24,6 @@ private:
 	std::vector<Platform *> *platforms;
 
 	Platform *getClosestPlatform();
-	void tryBounce();
 public:
 	float x, y;
 

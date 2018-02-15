@@ -14,13 +14,22 @@ class Platform;
 extern Game *globalGame;
 
 class Game {
+private:
+	bool gameOver;
+	bool gameStarted;
+	int gameOverTimer;
 public:
 	bool running;
 	int timeSinceClear;
 
 	// this game's specific stuff
+	int points;
+	float platformSpeed;
 	Ball *ball;
 	std::vector<Platform *> platforms;
+
+	void endGame();
+	void startOver();
 
 	// game stuff
 	void loop();

@@ -1,7 +1,7 @@
 #pragma once
 
-#define PLATFORM_SPAWN_DIST (0.15f)
-#define PLATFORM_BALL_INTERCEPT (0.04f)
+#define PLATFORM_SPAWN_DIST (0.17f)
+#define PLATFORM_BALL_INTERCEPT (0.02f)
 
 class Platform {
 private:
@@ -11,7 +11,7 @@ private:
 public:
 	// position
 	double x, y, z;
-	double spd;
+	double size;
 	bool bounced;
 
 	void reset();
