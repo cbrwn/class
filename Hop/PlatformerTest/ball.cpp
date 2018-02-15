@@ -13,6 +13,7 @@ Ball::Ball(std::vector<Platform*>* pforms) : platforms(pforms)
 	this->drawY = y;
 	this->xvel = 0.0f;
 	this->dead = false;
+	this->distBetweenBounce = 0.0f;
 
 	// make shape (omg I can't draw a circle)
 	// (it looks better when it's running trust me)
@@ -38,8 +39,6 @@ void Ball::update()
 			this->drawY += 0.5f;
 		return;
 	}
-
-	Platform *close = getClosestPlatform();
 
 	// temp auto control
 	//this->x -= (this->x - close->x) * 0.12f;
@@ -83,6 +82,8 @@ void Ball::update()
 
 	// how high the ball will be at the height of its bounce
 	const float bounceHeight = 12.1f;
+
+	Platform *close = getClosestPlatform();
 
 	// grab the distance as a percentage of the spawn distance
 	double waveDif = (close->z - this->distBetweenBounce) / PLATFORM_SPAWN_DIST;
@@ -138,7 +139,8 @@ void Ball::draw()
 			continue;
 		if (ypos >= SCREEN_HEIGHT)
 			continue;
-
+		
+		// print at x - 5 to make x be the center of the ball
 		SetConsoleCursorPos((int)this->x - 5, ypos);
 		printf(this->shape[i]);
 	}
