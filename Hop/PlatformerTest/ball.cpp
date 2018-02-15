@@ -39,8 +39,6 @@ void Ball::update()
 		return;
 	}
 
-	// how high the ball will be at the height of its bounce
-	const double bounceHeight = 12.1;
 	Platform *close = getClosestPlatform();
 
 	// temp auto control
@@ -60,8 +58,8 @@ void Ball::update()
 	{
 		// slow down
 		if (fabs(this->xvel) > 0.2f)
-			this->xvel *= 0.8;
-		else if (fabs(this->xvel) > 0.0f)
+			this->xvel *= 0.8f;
+		else if (fabs(this->xvel) > 0.0f) // (or stop)
 			this->xvel = 0.0f;
 	}
 	else
@@ -83,10 +81,13 @@ void Ball::update()
 	if (this->x > SCREEN_WIDTH - 4.0f)
 		this->x = SCREEN_WIDTH - 4.0f;
 
+	// how high the ball will be at the height of its bounce
+	const float bounceHeight = 12.1f;
+
 	// grab the distance as a percentage of the spawn distance
 	double waveDif = (close->z - this->distBetweenBounce) / PLATFORM_SPAWN_DIST;
 	// use sin to make a smooth wave up and then down between each platform
-	this->drawY = y - abs(sin(waveDif * 3.14159f) * bounceHeight);
+	this->drawY = y - fabs(sinf(waveDif * 3.14159f) * bounceHeight);
 
 	// try to bounce!
 	if (close->z <= PLATFORM_BALL_INTERCEPT)
@@ -128,11 +129,16 @@ void Ball::draw()
 		if (this->bounceAnimTime > 0 && i == 3)
 			continue;
 		int ypos = (int)(this->drawY - yofs);
+
+		// move the offset up for the next row
 		yofs--;
+
+		// make sure this line is in the screen bounds
 		if (ypos < 0)
 			continue;
 		if (ypos >= SCREEN_HEIGHT)
 			continue;
+
 		SetConsoleCursorPos((int)this->x - 5, ypos);
 		printf(this->shape[i]);
 	}

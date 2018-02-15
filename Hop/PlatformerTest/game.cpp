@@ -127,9 +127,11 @@ void Game::draw()
 		printf("press enter to restart");
 	}
 
-	// score thing
+	// score display
 	SetConsoleCursorPos(SCREEN_WIDTH / 2 - 1, 3);
-	printf("%d", this->points);
+	char pointString[6] = "";
+	sprintf(pointString, "%d ", this->points);
+	PrintCenter(pointString, 3);
 }
 
 // called when the player dies

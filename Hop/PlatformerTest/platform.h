@@ -10,8 +10,8 @@ private:
 	Platform *getFurthestPlatform();
 public:
 	// position
-	double x, y, z;
-	double size;
+	float x, y, z;
+	float size;
 	bool bounced;
 
 	void reset();

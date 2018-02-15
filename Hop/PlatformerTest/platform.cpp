@@ -13,7 +13,7 @@ Platform::Platform(float x, float y, float z) : x(x), y(y), z(z)
 void Platform::update()
 {
 	// make sure size doesn't go too low
-	const double minSize = 0.3;
+	const float minSize = 0.3f;
 	if (this->size <= minSize)
 		this->size = minSize;
 
@@ -31,20 +31,23 @@ void Platform::draw()
 	// I have no idea how I got these numbers apart from playing around
 	// the width increases exponentially as the z value gets lower
 	// lower z = closer to camera = larger object
-	float drawWidth = (2.0f / ((z) / 15.0f)) * 0.04f * this->size;
 
-	float distInverse = (2.0f / ((z) / 15.0f)) * 0.04;
+	// distinverse is a baseline size value for the current distance
+	float distInverse = (2.0f / ((z) / 15.0f)) * 0.04f;
 
+	// and we multiply that by size to change the width
+	float drawWidth = distInverse * this->size;
+	
+	// too close! it gets funky if it gets super close
+	//   so let's stop drawing it, this is like the 'camera' position
 	if (this->z < 0.019f)
-	{
 		return;
-	}
 
 	// vertical difference between the front edge and the back edge
 	int backDrawHeight = (int)(distInverse * 0.08f);
 
 	// calculate corners of platform
-	int frontLeft = (int)this->x - drawWidth / 2;
+	int frontLeft = (int)(this->x - drawWidth / 2);
 
 	// adjust values for if the platform is to be drawn off screen
 	if (frontLeft < 0)
@@ -53,25 +56,25 @@ void Platform::draw()
 		frontLeft = 0;
 	}
 	if (frontLeft + drawWidth >= SCREEN_WIDTH)
-		drawWidth = (SCREEN_WIDTH - frontLeft) - 1;
+		drawWidth = (SCREEN_WIDTH - frontLeft) - 1.0f;
 
 	// y position of the front edge
-	int frontY = (int)this->y + (distInverse/6) + 1;
+	int frontY = (int)(this->y + (distInverse/6) + 1);
 
 	// width of the back edge
 	int backDrawWidth = (int)(drawWidth - backDrawHeight - 4);
 
 	// x positions of corners
-	int frontRight = frontLeft + drawWidth;
-	int backLeft = (int)this->x - backDrawWidth / 2 - 1;
+	int frontRight = (int)(frontLeft + drawWidth);
+	int backLeft = (int)(this->x - backDrawWidth / 2 - 1);
 	int backRight = backLeft + backDrawWidth;
 
 	// how thick (tall?) the platform should be drawn
-	int visibleHeight = distInverse / 17;
+	int visibleHeight = (int)(distInverse / 17);
 
 	// draw front of platform
-	drawHorizontalLine(frontLeft, frontY, drawWidth); // top edge
-	drawHorizontalLine(frontLeft, frontY + visibleHeight, drawWidth); // bottom edge
+	drawHorizontalLine(frontLeft, frontY, (int)drawWidth); // top edge
+	drawHorizontalLine(frontLeft, frontY + visibleHeight, (int)drawWidth); // bottom edge
 	// and back of platform if necessary
 	if(backDrawHeight >= 1.0f)
 		drawHorizontalLine(backLeft, frontY - backDrawHeight, backDrawWidth);
@@ -104,7 +107,8 @@ void Platform::draw()
 		int drawX = (int)(cosf(ang) * i);
 		SetConsoleCursorPos(frontLeft + drawX, frontY - i);
 		printf("/");
-
+		
+		// right edge
 		drawX = (int)(cosf(ang + 3.14159f) * i);
 		SetConsoleCursorPos(frontRight + drawX - 1, frontY - i);
 		printf("\\");
@@ -144,12 +148,12 @@ void Platform::reset()
 {
 	this->bounced = false;
 	// 20 < x < (screen width - 40)
-	this->x = 20 + (rand() % (int)(SCREEN_WIDTH - 40));
+	this->x = 20.0f + (rand() % (int)(SCREEN_WIDTH - 40));
 	// make sure it's a set distance away from the furthest platform instead of
 	//    the camera so the gaps between the platforms stay consistent
 	this->z = this->getFurthestPlatform()->z + PLATFORM_SPAWN_DIST;
 
 	// increase difficulty slightly
-	this->size -= 0.02;
+	this->size -= 0.02f;
 	globalGame->platformSpeed += 0.0001f;
 }
