@@ -48,6 +48,9 @@ void Game::loop()
 
 void Game::init()
 {
+	// clear everything - for restarting, not so much for the beginning of the program
+	system("cls");
+
 	// these platforms will loop
 	this->platforms.push_back(new Platform(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 2, 0.0f));
 	this->platforms.push_back(new Platform(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 2, PLATFORM_SPAWN_DIST));
@@ -66,7 +69,18 @@ void Game::init()
 void Game::update()
 {
 	if (IsKeyDown(VK_SPACE))
+	{
+		// clear the starting text (badly)
+		SetConsoleCursorPos(2, 2);
+		printf("                     ");
+		SetConsoleCursorPos(2, 4);
+		printf("                           ");
+		SetConsoleCursorPos(2, 5);
+		printf("                       ");
+
+		// start the game :D
 		this->gameStarted = true;
+	}
 
 	if (!this->gameStarted)
 		return;
@@ -92,8 +106,7 @@ void Game::update()
 			this->startOver();
 	}
 
-	// this will be used once I stop using cls to clear the screen
-	//    to clean up any missed characters
+	// use cls occasionally to clear anything that was missed by clearObjects
 	this->timeSinceClear++;
 	if (this->timeSinceClear >= 100) {
 		this->timeSinceClear = 0;
@@ -103,7 +116,6 @@ void Game::update()
 
 void Game::draw()
 {
-	//system("cls");
 	for (Platform *p : platforms)
 		p->draw();
 	ball->draw();

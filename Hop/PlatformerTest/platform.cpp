@@ -170,6 +170,10 @@ void Platform::reset()
 
 void Platform::clear()
 {
+	// if this is 999 that means the platform wasn't drawn so there's nothing to clear
+	if (this->clearRect.left == 999)
+		return;
+
 	for (int y = this->clearRect.top; y <= this->clearRect.bottom; y++)
 	{
 		SetConsoleCursorPos(this->clearRect.left, y);
