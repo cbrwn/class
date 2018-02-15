@@ -59,7 +59,7 @@ void Game::init()
 	this->platformSpeed = 0.005f;
 
 	this->gameStarted = false;
-	this->isGameOver = false;
+	this->gameOver = false;
 	this->gameOverTimer = 0;
 }
 
@@ -82,7 +82,7 @@ void Game::update()
 	ball->update();
 
 	// update game over screen
-	if (this->isGameOver)
+	if (this->gameOver)
 	{
 		if (this->gameOverTimer > 0)
 			this->gameOverTimer--;
@@ -119,7 +119,7 @@ void Game::draw()
 	}
 
 	// draw game over screen
-	if (this->isGameOver && this->gameOverTimer <= 0)
+	if (this->gameOver && this->gameOverTimer <= 0)
 	{
 		SetConsoleCursorPos(2, 2);
 		printf("game over");
@@ -133,9 +133,9 @@ void Game::draw()
 }
 
 // called when the player dies
-void Game::gameOver()
+void Game::endGame()
 {
-	this->isGameOver = true;
+	this->gameOver = true;
 	this->platformSpeed = 0.0f;
 
 	// this timer controls when the game over screen appears

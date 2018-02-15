@@ -90,7 +90,7 @@ void Ball::update()
 		if (difx > 20.0f * close->size)
 		{
 			this->dead = true;
-			globalGame->gameOver();
+			globalGame->endGame();
 			return;
 		}
 
