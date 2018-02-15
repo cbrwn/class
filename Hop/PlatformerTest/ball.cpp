@@ -15,6 +15,8 @@ Ball::Ball(std::vector<Platform*>* pforms) : platforms(pforms)
 	this->dead = false;
 	this->distBetweenBounce = 0.0f;
 
+	this->clearRect = { 0,0,0,0 };
+
 	// make shape (omg I can't draw a circle)
 	// (it looks better when it's running trust me)
 	this->shape[0] = "  __.__";
@@ -86,7 +88,7 @@ void Ball::update()
 	Platform *close = getClosestPlatform();
 
 	// grab the distance as a percentage of the spawn distance
-	double waveDif = (close->z - this->distBetweenBounce) / PLATFORM_SPAWN_DIST;
+	float waveDif = (close->z - this->distBetweenBounce) / PLATFORM_SPAWN_DIST;
 	// use sin to make a smooth wave up and then down between each platform
 	this->drawY = y - fabs(sinf(waveDif * 3.14159f) * bounceHeight);
 
@@ -118,6 +120,9 @@ void Ball::update()
 
 void Ball::draw()
 {
+	// set the clear rect to some garbage so it gets replaced
+	this->clearRect = { 999,999,-999,-99 };
+
 	// keep this offset outside of the loop to let us 'cut out' certain rows just by continuing
 	// start from (y + height - 1) so the bottom of the ball is at y
 	int yofs = BALL_ART_SIZE - 1;
@@ -141,8 +146,16 @@ void Ball::draw()
 			continue;
 		
 		// print at x - 5 to make x be the center of the ball
-		SetConsoleCursorPos((int)this->x - 5, ypos);
+		int xpos = (int)this->x - 5;
+
+		SetConsoleCursorPos(xpos, ypos);
 		printf(this->shape[i]);
+
+		// update clear rect
+		this->clearRect.left = min(this->clearRect.left, xpos);
+		this->clearRect.top = min(this->clearRect.top, ypos);
+		this->clearRect.right = max(this->clearRect.right, xpos);
+		this->clearRect.bottom = max(this->clearRect.bottom, ypos);
 	}
 }
 
@@ -160,4 +173,13 @@ Platform *Ball::getClosestPlatform()
 			closest = p;
 	}
 	return closest;
+}
+
+void Ball::clear()
+{
+	for (int y = this->clearRect.top; y <= this->clearRect.bottom; y++)
+	{
+		SetConsoleCursorPos(this->clearRect.left, y);
+		printf("         ");
+	}
 }

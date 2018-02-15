@@ -36,6 +36,7 @@ public:
 
 	void init();
 	void update();
+	void clearObjects();
 	void draw();
 
 	Game();

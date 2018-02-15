@@ -8,6 +8,7 @@ Platform::Platform(float x, float y, float z) : x(x), y(y), z(z)
 {
 	this->size = 1.0;
 	this->bounced = false;
+	this->clearRect = { 0,0,0,0 };
 }
 
 void Platform::update()
@@ -24,6 +25,9 @@ void Platform::update()
 
 void Platform::draw()
 {
+	// set clear rect to garbage so we can tell when it's not being drawn
+	this->clearRect = { 999,999,-999,-999 };
+
 	// don't draw if it's past where our view would be
 	if (this->z <= 0.0f)
 		return;
@@ -91,6 +95,12 @@ void Platform::draw()
 		}
 	}
 
+	// set clear rectangle
+	this->clearRect.left = frontLeft;
+	this->clearRect.top = frontY - backDrawHeight;
+	this->clearRect.right = frontRight;
+	this->clearRect.bottom = frontY + visibleHeight;
+
 	// no need for connecting lines if the lines we're connecting are only 1 line apart
 	if (backDrawHeight <= 1)
 		return;
@@ -156,4 +166,16 @@ void Platform::reset()
 	// increase difficulty slightly
 	this->size -= 0.02f;
 	globalGame->platformSpeed += 0.0001f;
+}
+
+void Platform::clear()
+{
+	for (int y = this->clearRect.top; y <= this->clearRect.bottom; y++)
+	{
+		SetConsoleCursorPos(this->clearRect.left, y);
+		for (int x = 0; x <= this->clearRect.right - this->clearRect.left; x++)
+		{
+			printf(" ");
+		}
+	}
 }

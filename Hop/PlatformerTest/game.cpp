@@ -38,7 +38,7 @@ void Game::loop()
 			break;
 
 		this->update();
-
+		this->clearObjects();
 		this->draw();
 		
 		// makes it run slower (in a good way) and flicker less
@@ -94,16 +94,16 @@ void Game::update()
 
 	// this will be used once I stop using cls to clear the screen
 	//    to clean up any missed characters
-	/*this->timeSinceClear++;
+	this->timeSinceClear++;
 	if (this->timeSinceClear >= 100) {
 		this->timeSinceClear = 0;
 		system("cls");
-	}*/
+	}
 }
 
 void Game::draw()
 {
-	system("cls");
+	//system("cls");
 	for (Platform *p : platforms)
 		p->draw();
 	ball->draw();
@@ -150,4 +150,11 @@ void Game::startOver()
 {
 	this->~Game();
 	this->init();
+}
+
+void Game::clearObjects()
+{
+	for (Platform *p : platforms)
+		p->clear();
+	ball->clear();
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include "util.h"
 
 #define BALL_ART_SIZE (7)
 
@@ -12,6 +13,8 @@ class Platform;
 class Ball
 {
 private:
+	Rect clearRect;
+
 	int bounceAnimTime;
 
 	bool dead;
@@ -28,6 +31,7 @@ public:
 	float x, y;
 
 	void update();
+	void clear();
 	void draw();
 
 	Ball(std::vector<Platform *> *pforms);
